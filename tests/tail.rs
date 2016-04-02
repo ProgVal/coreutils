@@ -1,3 +1,4 @@
+use std::io::Read;
 use std::io::Write;
 
 #[macro_use]
@@ -36,6 +37,24 @@ fn test_null_default() {
     let (at, mut ucmd) = testing(UTIL_NAME);
     let result = ucmd.arg("-z").arg(FOOBAR_WITH_NULL_TXT).run();
     assert_eq!(result.stdout, at.read("foobar_with_null_default.expected"));
+}
+
+#[test]
+fn test_follow() {
+    let (at, mut ucmd) = testing(UTIL_NAME);
+
+    let mut child = ucmd.arg("-f").arg(FOOBAR_TXT).run_no_wait();
+
+    let expected = at.read("foobar_single_default.expected");
+    assert_eq!(read_size(&mut child, expected.len()), expected);
+
+    // We write in a temporary copy of foobar.txt
+    let expected = "line1\nline2\n";
+    at.append(FOOBAR_TXT, expected);
+
+    assert_eq!(read_size(&mut child, expected.len()), expected);
+
+    child.kill().unwrap();
 }
 
 #[test]
