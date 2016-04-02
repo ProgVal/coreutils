@@ -241,13 +241,13 @@ impl AtPath {
 
     pub fn write(&self, name: &str, contents: &str) {
         let mut f = self.open(name);
-        let _ = f.write(contents.as_bytes());
+        let _ = f.write_all(contents.as_bytes());
     }
 
     pub fn append(&self, name: &str, contents: &str) {
         log_info("open(append)", self.plus_as_string(name));
         let mut f = OpenOptions::new().append(true).open(self.plus(name)).unwrap();
-        let _ = f.write(contents.as_bytes());
+        let _ = f.write_all(contents.as_bytes());
     }
 
     pub fn mkdir(&self, dir: &str) {
